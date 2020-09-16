@@ -2,6 +2,8 @@ package com.xiaojiaqi.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import com.xiaojiaqi.external.A;
+import com.xiaojiaqi.external.B;
 import com.xiaojiaqi.messageSource.Validator;
 import com.xiaojiaqi.pojo.NestableInvocationBO;
 import org.hibernate.jpa.HibernatePersistenceProvider;
@@ -10,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -30,8 +33,7 @@ import javax.sql.DataSource;
         basePackages = "com.xiaojiaqi"
 )
 @EnableAspectJAutoProxy(exposeProxy = true)
-@EnableJpaRepositories("com.xiaojiaqi")
-@EnableTransactionManagement
+@PropertySource("classpath:/app.properties")
 public class MainConfig {
 
     @Autowired
@@ -52,29 +54,44 @@ public class MainConfig {
         bds.setPassword(env.getProperty("jdbc.password"));
         bds.setUsername(env.getProperty("jdbc.username"));
         bds.setUrl(env.getProperty("jdbc.url"));
+        bds.setMaxActive(1000);
+        bds.setMinEvictableIdleTimeMillis(600);
+        bds.setInitialSize(10);
+        bds.setMinIdle(10);
         return bds;
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-
-        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        vendorAdapter.setGenerateDdl(true);
-
-        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-        factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("com.xiaojiaqi");
-        factory.setPersistenceProvider(new HibernatePersistenceProvider());
-
-        factory.setDataSource(dataSource());
-        return factory;
+    public A a(){
+        return new A();
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-
-        JpaTransactionManager txManager = new JpaTransactionManager();
-        txManager.setEntityManagerFactory(entityManagerFactory);
-        return txManager;
+    public B b(){
+        return new B();
     }
+
+//    @Bean
+//    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+//
+//        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+//        vendorAdapter.setGenerateDdl(true);
+//
+//        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+//        factory.setJpaVendorAdapter(vendorAdapter);
+//        factory.setPackagesToScan("com.xiaojiaqi");
+//        factory.setPersistenceProvider(new HibernatePersistenceProvider());
+//
+//        factory.setDataSource(dataSource());
+//        return factory;
+//    }
+
+//    @Bean
+//    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+//
+//        JpaTransactionManager txManager = new JpaTransactionManager();
+//        txManager.setEntityManagerFactory(entityManagerFactory);
+//        return txManager;
+//    }
+
 }
